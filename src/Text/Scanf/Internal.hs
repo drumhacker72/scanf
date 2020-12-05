@@ -5,7 +5,9 @@
 module Text.Scanf.Internal where
 
 import Data.Char (isSpace)
-import Data.List (stripPrefix)
+import Text.ParserCombinators.ReadP (ReadP, get, munch, readP_to_S, readS_to_P, skipSpaces)
+
+import qualified Text.ParserCombinators.ReadP as ReadP
 
 -- | A pretty pair type to build lists with values of different types. 
 -- Remember to close lists with @()@.
@@ -100,37 +102,32 @@ string = String
 char :: Format t -> Format (Char :+ t)
 char = Char
 
-readmap :: (a -> b) -> ReadS a -> ReadS b
-readmap f = (fmap . fmap) (\(r, s) -> (f r, s))
-
-readsFormat :: Format t -> ReadS t
-readsFormat (Constant z f) s = do
-  Just s' <- pure (stripPrefix z s)
-  readsFormat f s'
-readsFormat (Readable f) s = do
-  (a, s') <- readsPrec 0 s
-  readmap (a :+) (readsFormat f) s'
-readsFormat (String f) s = do
-  let (s0, s') = break isSpace s
-  readmap (s0 :+) (readsFormat f) s'
-readsFormat (Char f) s = do
-  c : s' <- pure s
-  readmap (c :+) (readsFormat f) s'
-readsFormat (Whitespace _ f) s = do
-  let s' = dropWhile isSpace s
-  readsFormat f s'
-readsFormat Empty s = pure ((), s)
+fromFormat :: Format t -> ReadP t
+fromFormat (Constant z f) = do
+  _ <- ReadP.string z
+  fromFormat f
+fromFormat (Readable f) = do
+  a <- readS_to_P reads
+  (a :+) <$> fromFormat f
+fromFormat (String f) = do
+  s0 <- munch (not . isSpace)
+  (s0 :+) <$> fromFormat f
+fromFormat (Char f) = do
+  c <- get
+  (c :+) <$> fromFormat f
+fromFormat (Whitespace _ f) = do
+  skipSpaces
+  fromFormat f
+fromFormat Empty = return ()
 
 -- | Parse a string according to a format string.
 --
 -- @
--- 'scanf' ['Text.Scanf.fmt'|Hello %s|] \"Hello world!\" :: 'Maybe' ('String' ':+' ())
---   = (\"world!\" ':+' ())
+-- 'scanf' ['Text.Scanf.fmt'|Hello %s|] \"Hello world!\" :: ReadS ('String' ':+' ())
+--   = [(\"world!\" ':+' (), \"\")]
 -- @
-scanf :: Format t -> String -> Maybe t
-scanf f s = do
-  (r, _) : _ <- pure (readsFormat f s)
-  pure r
+scanf :: Format t -> ReadS t
+scanf f = readP_to_S $ fromFormat f
 
 -- | Print a string according to a format string.
 --

@@ -1,5 +1,6 @@
+cabal-version:       2.2
 name:                scanf
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            Easy and type-safe format strings for parsing and printing
 description:
 
@@ -7,17 +8,16 @@ description:
   .
   See README.
 
-homepage:            https://github.com/Lysxia/scanf#readme
+homepage:            https://github.com/drumhacker72/scanf#readme
 license:             MIT
 license-file:        LICENSE
 author:              Li-yao Xia
-maintainer:          lysxia@gmail.com
-copyright:           2018 Li-yao Xia
+maintainer:          drumhacker72@gmail.com
+copyright:           2018 Li-yao Xia, 2020 J. Nelson
 category:            Text
 build-type:          Simple
 extra-source-files:  README.md
-cabal-version:       >=1.10
-tested-with:         GHC == 7.10.3, GHC == 8.0.2, GHC == 8.2.2, GHC == 8.4.1
+tested-with:         GHC == 8.8.3
 
 library
   hs-source-dirs:      src
@@ -43,4 +43,4 @@ test-suite example-test
 
 source-repository head
   type:     git
-  location: https://github.com/Lysxia/scanf
+  location: https://github.com/drumhacker72/scanf

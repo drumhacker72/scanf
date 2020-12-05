@@ -1,11 +1,11 @@
-# Haskell scanf [![Build Status](https://travis-ci.org/Lysxia/scanf.svg?branch=master)](https://travis-ci.org/Lysxia/scanf) [![Hackage](https://img.shields.io/hackage/v/scanf.svg)](https://hackage.haskell.org/package/scanf)
+# Haskell scanf
 
 A lightweight library for one-off parsing and printing.
 
 ```haskell
 scanf [fmt|%d lazy %s and %d strict %s|]
       "3 lazy functions and 2 strict fields"
-  = Just (3 :+ "functions" :+ 2 :+ "fields" :+ ())
+  = [(3 :+ "functions" :+ 2 :+ "fields" :+ (), "")]
 ```
 
 Quasiquotes are optional. Format strings can also be defined with pure
